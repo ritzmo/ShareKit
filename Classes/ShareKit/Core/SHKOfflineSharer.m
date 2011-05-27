@@ -81,6 +81,7 @@
     self.sharer = aSharer;
     [aSharer release];
 	sharer.item = item;
+	sharer.item.currentOwner = sharer;
 	sharer.quiet = YES;
 	sharer.shareDelegate = self;
 	
