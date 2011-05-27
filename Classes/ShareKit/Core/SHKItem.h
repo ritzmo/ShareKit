@@ -55,6 +55,7 @@ typedef enum
 	
 	@private
 		NSMutableDictionary *custom;
+		NSObject *currentOwner;
 }
 
 @property (nonatomic)			SHKShareType shareType;
@@ -71,10 +72,14 @@ typedef enum
 @property (nonatomic, retain)	NSString *mimeType;
 @property (nonatomic, retain)	NSString *filename;
 
+@property (assign)	NSObject *currentOwner;
+
 + (id)URL:(NSURL *)url title:(NSString *)title;
 + (id)image:(UIImage *)image title:(NSString *)title;
 + (id)text:(NSString *)text;
 + (id)file:(NSData *)data filename:(NSString *)filename mimeType:(NSString *)mimeType title:(NSString *)title;
+
+- (void)setAlternateText:(NSString *)alternateText toShareOn:(NSString *)sharer;
 
 - (void)setCustomValue:(NSString *)value forKey:(NSString *)key;
 - (NSString *)customValueForKey:(NSString *)key;
