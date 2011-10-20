@@ -92,10 +92,9 @@
 						 [NSNumber numberWithInt:SHK_ALLOW_AUTOSHARE], @"allowAutoShare", 
 						 [NSNumber numberWithInt:SHKUsePlaceholders], @"usePlaceholders", 
 						 nil];
-	}
-	
-	if(SHKDebugShowLogs) {
-		SHKLog(@"Legacy configuration: %@", configuration);
+		if(SHKDebugShowLogs) {
+			SHKLog(@"Legacy configuration: %@", configuration);
+		}
 	}
 
     return self;	
