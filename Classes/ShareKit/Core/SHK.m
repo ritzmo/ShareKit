@@ -655,7 +655,7 @@ void SHKSwizzle(Class c, SEL orig, SEL newClassName)
 NSString* SHKLocalizedString(NSString* key, ...) 
 {
 	// Localize the format
-	NSString *localizedStringFormat = NSLocalizedString(key, key);
+	NSString *localizedStringFormat = NSLocalizedStringFromTable(key, @"ShareKit", key);
 	
 	va_list args;
     va_start(args, key);
