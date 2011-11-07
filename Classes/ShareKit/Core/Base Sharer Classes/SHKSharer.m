@@ -204,6 +204,7 @@
 	
 	// Create controller set share options
 	self.item = i;
+	self.item.currentOwner = self;
 }
 
 + (id)shareURL:(NSURL *)url
