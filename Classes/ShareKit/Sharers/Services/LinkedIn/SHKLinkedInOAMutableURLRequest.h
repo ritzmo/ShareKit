@@ -1,9 +1,8 @@
 //
-//  SHKTwitter.h
+//  SHKLinkedInOAMutableURLRequest.h
 //  ShareKit
 //
-//  Created by Nathan Weiner on 6/21/10.
-
+//  Created by Robin Hos (Everdune) on 9/22/11.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -25,38 +24,26 @@
 //
 //
 
-#import <Foundation/Foundation.h>
-#import "SHKOAuthSharer.h"
-#import "SHKTwitterForm.h"
+#import "OAMutableURLRequest.h"
 
-@interface SHKTwitter : SHKOAuthSharer <SHKFormControllerLargeTextFieldDelegate>
-{	
-	BOOL xAuth;		
+@interface SHKLinkedInOAMutableURLRequest : OAMutableURLRequest {
+    NSString *callback;
 }
 
-@property BOOL xAuth;
+- (id)initWithURL:(NSURL *)aUrl
+		 consumer:(OAConsumer *)aConsumer
+			token:(OAToken *)aToken
+            realm:(NSString *)aRealm
+signatureProvider:(id<OASignatureProviding, NSObject>)aProvider 
+         callback:(NSString*)aCallback;
 
-
-#pragma mark -
-#pragma mark UI Implementation
-
-- (void)showTwitterForm;
-
-#pragma mark -
-#pragma mark Share API Methods
-
-- (void)sendForm:(SHKTwitterForm *)form;
-
-- (void)sendStatus;
-- (void)sendStatusTicket:(OAServiceTicket *)ticket didFinishWithData:(NSData *)data;
-- (void)sendStatusTicket:(OAServiceTicket *)ticket didFailWithError:(NSError*)error;
-- (void)sendImage;
-- (void)sendImageTicket:(OAServiceTicket *)ticket didFinishWithData:(NSData *)data;
-- (void)sendImageTicket:(OAServiceTicket *)ticket didFailWithError:(NSError*)error;
-- (void)sendUserInfo;
-- (void)sendUserInfo:(OAServiceTicket *)ticket didFinishWithData:(NSData *)data;
-- (void)sendUserInfo:(OAServiceTicket *)ticket didFailWithError:(NSError*)error;
-
-- (void)followMe;
+- (id)initWithURL:(NSURL *)aUrl
+		 consumer:(OAConsumer *)aConsumer
+			token:(OAToken *)aToken
+            realm:(NSString *)aRealm
+signatureProvider:(id<OASignatureProviding, NSObject>)aProvider
+            nonce:(NSString *)aNonce
+        timestamp:(NSString *)aTimestamp
+         callback:(NSString*)aCallback;
 
 @end

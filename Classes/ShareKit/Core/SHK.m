@@ -46,7 +46,7 @@ NSString * const SHKHideCurrentViewFinishedNotification = @"SHKHideCurrentViewFi
 @property (nonatomic, assign) UIViewController *rootViewController, *currentRootViewController;
 
 - (UIViewController *)getCurrentRootViewController;
-- (UIViewController *)getTopViewController:(UIViewController *)rootViewController;
+- (UIViewController *)getTopViewController:(UIViewController *)aRootViewController;
 
 @end
 
@@ -262,9 +262,9 @@ BOOL SHKinit;
 	}
 }
 										   
-- (UIViewController *)getTopViewController:(UIViewController *)rootViewController
+- (UIViewController *)getTopViewController:(UIViewController *)aRootViewController
 {
-	UIViewController *result = rootViewController;
+	UIViewController *result = aRootViewController;
 	while (result.modalViewController != nil)
 		result = result.modalViewController;
 	return result;
@@ -327,15 +327,15 @@ BOOL SHKinit;
 		switch (type) 
 		{
 			case SHKShareTypeURL:
-				favoriteSharers = [NSArray arrayWithObjects:@"SHKTwitter",@"SHKFacebook",@"SHKReadItLater",nil];
+				favoriteSharers = [NSArray arrayWithObjects:@"SHKTwitter",@"SHKFacebook",@"SHKReadItLater",@"SHKVkontakte", nil];
 				break;
 				
 			case SHKShareTypeImage:
-				favoriteSharers = [NSArray arrayWithObjects:@"SHKMail",@"SHKFacebook",@"SHKCopy",nil];
+				favoriteSharers = [NSArray arrayWithObjects:@"SHKMail",@"SHKFacebook", @"SHKCopy",@"SHKVkontakte", nil];
 				break;
 				
 			case SHKShareTypeText:
-				favoriteSharers = [NSArray arrayWithObjects:@"SHKMail",@"SHKTwitter",@"SHKFacebook",nil];
+				favoriteSharers = [NSArray arrayWithObjects:@"SHKMail",@"SHKTwitter",@"SHKFacebook",@"SHKVkontakte", @"SHKLinkedIn", nil];
 				break;
 				
 			case SHKShareTypeFile:

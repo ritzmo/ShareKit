@@ -1,9 +1,9 @@
 //
-//  SHKTwitter.h
+//  SHKVkontakteForm.h
 //  ShareKit
 //
-//  Created by Nathan Weiner on 6/21/10.
-
+//  Created by Alterplay Team on 06.12.11.
+//  Based on https://github.com/maiorov/VKAPI
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -25,38 +25,18 @@
 //
 //
 
-#import <Foundation/Foundation.h>
-#import "SHKOAuthSharer.h"
-#import "SHKTwitterForm.h"
+#import <UIKit/UIKit.h>
 
-@interface SHKTwitter : SHKOAuthSharer <SHKFormControllerLargeTextFieldDelegate>
-{	
-	BOOL xAuth;		
+@interface SHKVkontakteForm : UIViewController <UITextViewDelegate>
+{
+	id delegate;
+	UITextView *textView;
 }
 
-@property BOOL xAuth;
+@property (nonatomic, assign) id delegate;
+@property (nonatomic, retain) UITextView *textView;
 
-
-#pragma mark -
-#pragma mark UI Implementation
-
-- (void)showTwitterForm;
-
-#pragma mark -
-#pragma mark Share API Methods
-
-- (void)sendForm:(SHKTwitterForm *)form;
-
-- (void)sendStatus;
-- (void)sendStatusTicket:(OAServiceTicket *)ticket didFinishWithData:(NSData *)data;
-- (void)sendStatusTicket:(OAServiceTicket *)ticket didFailWithError:(NSError*)error;
-- (void)sendImage;
-- (void)sendImageTicket:(OAServiceTicket *)ticket didFinishWithData:(NSData *)data;
-- (void)sendImageTicket:(OAServiceTicket *)ticket didFailWithError:(NSError*)error;
-- (void)sendUserInfo;
-- (void)sendUserInfo:(OAServiceTicket *)ticket didFinishWithData:(NSData *)data;
-- (void)sendUserInfo:(OAServiceTicket *)ticket didFailWithError:(NSError*)error;
-
-- (void)followMe;
+- (void)save;
+- (void)keyboardWillShow:(NSNotification *)notification;
 
 @end

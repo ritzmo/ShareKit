@@ -1,9 +1,9 @@
 //
-//  SHKTwitter.h
+//  SHKFoursquareV2Venue.h
 //  ShareKit
 //
-//  Created by Nathan Weiner on 6/21/10.
-
+//  Created by Robin Hos (Everdune) on 9/26/11.
+//  Sponsored by Twoppy
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -26,37 +26,19 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SHKOAuthSharer.h"
-#import "SHKTwitterForm.h"
 
-@interface SHKTwitter : SHKOAuthSharer <SHKFormControllerLargeTextFieldDelegate>
-{	
-	BOOL xAuth;		
+@interface SHKFoursquareV2Venue : NSObject {
+    NSString *_venueId;
+    NSString *_name;
+    NSString *_address;
+    NSString *_icon;
 }
 
-@property BOOL xAuth;
+@property (nonatomic, copy) NSString *venueId;
+@property (nonatomic, copy) NSString *name;
+@property (nonatomic, copy) NSString *address;
+@property (nonatomic, copy) NSString *icon;
 
-
-#pragma mark -
-#pragma mark UI Implementation
-
-- (void)showTwitterForm;
-
-#pragma mark -
-#pragma mark Share API Methods
-
-- (void)sendForm:(SHKTwitterForm *)form;
-
-- (void)sendStatus;
-- (void)sendStatusTicket:(OAServiceTicket *)ticket didFinishWithData:(NSData *)data;
-- (void)sendStatusTicket:(OAServiceTicket *)ticket didFailWithError:(NSError*)error;
-- (void)sendImage;
-- (void)sendImageTicket:(OAServiceTicket *)ticket didFinishWithData:(NSData *)data;
-- (void)sendImageTicket:(OAServiceTicket *)ticket didFailWithError:(NSError*)error;
-- (void)sendUserInfo;
-- (void)sendUserInfo:(OAServiceTicket *)ticket didFinishWithData:(NSData *)data;
-- (void)sendUserInfo:(OAServiceTicket *)ticket didFailWithError:(NSError*)error;
-
-- (void)followMe;
++ (id)venueFromDictionary:(NSDictionary*)dictionary;
 
 @end
