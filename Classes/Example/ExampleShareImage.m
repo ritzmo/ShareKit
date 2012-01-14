@@ -70,7 +70,7 @@
 	SHKItem *item = [SHKItem image:imageView.image title:@"San Francisco"];
 	[item setAlternateText:@"Golden Gate Bridge #SanFrancisco" toShareOn:@"Twitter"];
 	SHKActionSheet *actionSheet = [SHKActionSheet actionSheetForItem:item];
-	
+	[SHK setRootViewController:self];
 	[actionSheet showFromToolbar:self.navigationController.toolbar];
 }
 

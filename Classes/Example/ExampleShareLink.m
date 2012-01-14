@@ -58,6 +58,7 @@
 	SHKItem *item = [SHKItem URL:webView.request.URL title:[webView pageTitle]];
 	[item setAlternateText:[NSString stringWithFormat:@"%@ #channel",[webView pageTitle]] toShareOn:@"Twitter"];
 	SHKActionSheet *actionSheet = [SHKActionSheet actionSheetForItem:item];
+    [SHK setRootViewController:self];
 	[actionSheet showFromToolbar:self.navigationController.toolbar]; 
 }
 
