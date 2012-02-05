@@ -31587,10 +31587,11 @@
 
 - (id) initWithInProtocol: (id <TProtocol>) anInProtocol outProtocol: (id <TProtocol>) anOutProtocol
 {
-  if ((self = [super init])) {
-    inProtocol = [anInProtocol retain];
-    outProtocol = [anOutProtocol retain];
-  }
+  self = [super init];
+  if (self) {
+      inProtocol = [anInProtocol retain];
+      outProtocol = [anOutProtocol retain];
+  }  
   return self;
 }
 

@@ -181,7 +181,9 @@ NSString *SHKLinkedInVisibilityCodeKey = @"visibility.code";
     rootView.maxTextLength = 700;  
     self.navigationBar.tintColor = SHKCONFIG_WITH_ARGUMENT(barTintForView:,self);
 	
-	[self pushViewController:rootView animated:NO];	
+	[self pushViewController:rootView animated:NO];
+    [rootView release];
+	
 	[[SHK currentHelper] showViewController:self];	
 }
 

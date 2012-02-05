@@ -116,19 +116,19 @@
  */
 
 - (NSString*)evernoteUserStoreURL {
-	return @"";
+	return @"https://sandbox.evernote.com/edam/user";
 }
 
 - (NSString*)evernoteNetStoreURLBase {
-	return @"";
+	return @"http://sandbox.evernote.com/edam/note/";
 }
 
 - (NSString*)evernoteConsumerKey {
-	return @"";
+	return @"vilemkurz";
 }
 
 - (NSString*)evernoteSecret {
-	return @"";
+	return @"e58755227940c41f";
 }
 // Flickr - http://www.flickr.com/services/apps/create/
 /*
@@ -190,7 +190,7 @@
 }
 
 - (UIColor*)barTintForView:(UIViewController*)vc {    
-       
+	
     if ([NSStringFromClass([vc class]) isEqualToString:@"SHKTwitter"]) 
         return [UIColor colorWithRed:0 green:151.0f/255 blue:222.0f/255 alpha:1];
     
