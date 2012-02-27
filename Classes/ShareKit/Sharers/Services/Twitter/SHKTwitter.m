@@ -33,6 +33,7 @@
 #import "JSONKit.h"
 #import "SHKXMLResponseParser.h"
 #import "SHKiOS5Twitter.h"
+#import "NSMutableDictionary+NSNullsToEmptyStrings.h"
 
 static NSString *const kSHKTwitterUserInfo=@"kSHKTwitterUserInfo";
 
@@ -43,7 +44,6 @@ static NSString *const kSHKTwitterUserInfo=@"kSHKTwitterUserInfo";
 - (void)shortenURLFinished:(SHKRequest *)aRequest;
 - (BOOL)validateItemAfterUserEdit;
 - (void)handleUnsuccessfulTicket:(NSData *)data;
-- (void)convertNSNullsToEmptyStrings:(NSMutableDictionary *)dict;
 - (BOOL)twitterFrameworkAvailable;
 
 @end
@@ -472,7 +472,7 @@ static NSString *const kSHKTwitterUserInfo=@"kSHKTwitterUserInfo";
             SHKLog(@"Error when parsing json twitter user info request:%@", [error description]);
         }
         
-        [self convertNSNullsToEmptyStrings:userInfo];
+        [userInfo convertNSNullsToEmptyStrings];
         [[NSUserDefaults standardUserDefaults] setObject:userInfo forKey:kSHKTwitterUserInfo];
         
         [self sendDidFinish];
@@ -730,20 +730,6 @@ static NSString *const kSHKTwitterUserInfo=@"kSHKTwitterUserInfo";
     
         NSError *error = [NSError errorWithDomain:@"Twitter" code:2 userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
         [self sendDidFailWithError:error];
-}
-
-- (void)convertNSNullsToEmptyStrings:(NSMutableDictionary *)dict
-{
-    NSArray *responseObjectKeys = [dict allKeys];
-    for (NSString *key in responseObjectKeys) {
-        id object = [dict objectForKey:key];
-        if (object == [NSNull null]) {
-            [dict setObject:@"" forKey:key];
-        }
-        if ([object isKindOfClass:[NSDictionary class]]) {
-            [self convertNSNullsToEmptyStrings:object];
-        }
-    }
 }
 
 @end
