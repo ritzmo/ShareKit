@@ -109,6 +109,20 @@ static NSString *const kSHKFacebookUserInfo =@"kSHKFacebookUserInfo";
 + (BOOL)handleOpenURL:(NSURL*)url 
 {
   Facebook *fb = [SHKFacebook facebook];
+  
+  //if app has "Application does not run in background" = YES, or was killed before it could return from Facebook SSO callback (from Safari or Facebook app)
+  if (!fb.sessionDelegate)
+  {      
+    SHKFacebook *facebookSharer = [[SHKFacebook alloc] init]; //released in fbDidLogin
+    
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:kSHKStoredItemKey])
+    {
+        facebookSharer.pendingAction = SHKPendingShare;
+    } 
+      
+    [fb setSessionDelegate:facebookSharer];      
+  }    
+    
   return [fb handleOpenURL:url];
 }
 
@@ -178,7 +192,7 @@ static NSString *const kSHKFacebookUserInfo =@"kSHKFacebookUserInfo";
 	
 	[[SHKFacebook facebook] setSessionDelegate:self];
     [self retain]; //must retain, because FBConnect does not retain its delegates. Released in callback.
-	[[SHKFacebook facebook] authorize:[NSArray arrayWithObjects:@"publish_stream", @"offline_access", nil]];		
+	[[SHKFacebook facebook] authorize:SHKCONFIG(facebookListOfPermissions)];		
 }
 
 + (void)logout
@@ -357,10 +371,9 @@ static NSString *const kSHKFacebookUserInfo =@"kSHKFacebookUserInfo";
   [self sendDidStart];
 }
 
-- (void)request:(FBRequest *)request didLoad:(id)result
+- (void)request:(FBRequest *)fbRequest didLoad:(id)result
 {   
-    if ([result objectForKey:@"username"]){
-        
+    if ([fbRequest.url hasSuffix:@"/me"] && [result objectForKey:@"id"]) {
         [result convertNSNullsToEmptyStrings];
         [[NSUserDefaults standardUserDefaults] setObject:result forKey:kSHKFacebookUserInfo];
     }     
@@ -372,7 +385,8 @@ static NSString *const kSHKFacebookUserInfo =@"kSHKFacebookUserInfo";
 - (void)request:(FBRequest*)aRequest didFailWithError:(NSError*)error 
 {
     //if user revoked app permissions
-    if (error.domain == @"facebookErrDomain" && error.code == 10000) {
+    NSNumber *fbErrorCode = [[error.userInfo valueForKey:@"error"] valueForKey:@"code"];
+    if (error.domain == @"facebookErrDomain" && [fbErrorCode intValue] == 190) {
         [self shouldReloginWithPendingAction:SHKPendingSend];
     } else {
         [self sendDidFailWithError:error];
@@ -386,7 +400,7 @@ static NSString *const kSHKFacebookUserInfo =@"kSHKFacebookUserInfo";
 
 - (void)show
 {
-    if (item.shareType == SHKShareTypeText)        
+    if (item.shareType == SHKShareTypeText || item.shareType == SHKShareTypeImage)        
     {
         [self showFacebookForm];
     }
@@ -398,8 +412,18 @@ static NSString *const kSHKFacebookUserInfo =@"kSHKFacebookUserInfo";
 
 - (void)showFacebookForm
 {
- 	SHKFormControllerLargeTextField *rootView = [[SHKFormControllerLargeTextField alloc] initWithNibName:nil bundle:nil delegate:self];  
- 	rootView.text = item.text;
+ 	SHKCustomFormControllerLargeTextField *rootView = [[SHKCustomFormControllerLargeTextField alloc] initWithNibName:nil bundle:nil delegate:self];  
+ 	
+    switch (self.item.shareType) {
+        case SHKShareTypeText:
+            rootView.text = item.text;
+            break;
+        case SHKShareTypeImage:
+            rootView.image = item.image;
+            rootView.text = item.title;            
+        default:
+            break;
+    }    
     
     self.navigationBar.tintColor = SHKCONFIG_WITH_ARGUMENT(barTintForView:,self);
  	[self pushViewController:rootView animated:NO];
@@ -408,9 +432,18 @@ static NSString *const kSHKFacebookUserInfo =@"kSHKFacebookUserInfo";
     [[SHK currentHelper] showViewController:self];  
 }
 
-- (void)sendForm:(SHKFormControllerLargeTextField *)form
+- (void)sendForm:(SHKCustomFormControllerLargeTextField *)form
 {  
- 	self.item.text = form.textView.text;
+ 	switch (self.item.shareType) {
+        case SHKShareTypeText:
+            self.item.text = form.textView.text;
+            break;
+        case SHKShareTypeImage:
+            self.item.title = form.textView.text;
+        default:
+            break;
+    }    
+    
  	[self tryToSend];
 }  
 

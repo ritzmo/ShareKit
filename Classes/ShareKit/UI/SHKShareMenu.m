@@ -65,8 +65,19 @@
 		self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit
                                                                                                 target:self
                                                                                                 action:@selector(edit)] autorelease];
+        
+        self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
 	}
+    
 	return self;
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+    if (SHKCONFIG(formBackgroundColor) != nil)
+        self.tableView.backgroundColor = SHKCONFIG(formBackgroundColor);
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -76,7 +87,6 @@
 	// Remove the SHK view wrapper from the window
 	[[SHK currentHelper] viewWasDismissed];
 }
-
 
 - (void)setItem:(SHKItem *)i
 {
@@ -98,7 +108,15 @@
 	// If not editing, hide them
 	
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"SHKExcluded"] != nil){
-        [self setExclusions:[NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:@"SHKExcluded"]]];
+    
+        NSObject *excluded = [[NSUserDefaults standardUserDefaults] objectForKey:@"SHKExcluded"];
+        
+        //due to backwards compatibility - SHKExcluded used to be saved as NSDictionary. It is better as NSArray, as favourites are NSArray too.
+        if ([excluded isKindOfClass:[NSDictionary class]]) {
+            [self setExclusions:[NSMutableArray arrayWithArray:[(NSDictionary*)excluded allKeys]]];
+        } else if ([excluded isKindOfClass:[NSArray class]]) {
+            [self setExclusions:[NSMutableArray arrayWithArray:(NSArray*)excluded]];
+        }
     }else{
         [self setExclusions:[NSMutableArray arrayWithCapacity:0]];
     }

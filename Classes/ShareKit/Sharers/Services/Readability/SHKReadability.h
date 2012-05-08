@@ -1,9 +1,7 @@
 //
-//  SHKTwitter.h
+//  SHKReadability.h
 //  ShareKit
 //
-//  Created by Nathan Weiner on 6/21/10.
-
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -27,34 +25,20 @@
 
 #import <Foundation/Foundation.h>
 #import "SHKOAuthSharer.h"
-#import "SHKCustomFormControllerLargeTextField.h"
+#import "SHKFormOptionController.h"
 
-@interface SHKTwitter : SHKOAuthSharer <SHKFormControllerLargeTextFieldDelegate>
+@interface SHKReadability : SHKOAuthSharer
 {	
 	BOOL xAuth;		
 }
 
 @property BOOL xAuth;
 
-
-#pragma mark -
-#pragma mark UI Implementation
-
-- (void)showTwitterForm;
-
 #pragma mark -
 #pragma mark Share API Methods
 
-- (void)sendStatus;
-- (void)sendStatusTicket:(OAServiceTicket *)ticket didFinishWithData:(NSData *)data;
-- (void)sendStatusTicket:(OAServiceTicket *)ticket didFailWithError:(NSError*)error;
-- (void)sendImage;
-- (void)sendImageTicket:(OAServiceTicket *)ticket didFinishWithData:(NSData *)data;
-- (void)sendImageTicket:(OAServiceTicket *)ticket didFailWithError:(NSError*)error;
-- (void)sendUserInfo;
-- (void)sendUserInfo:(OAServiceTicket *)ticket didFinishWithData:(NSData *)data;
-- (void)sendUserInfo:(OAServiceTicket *)ticket didFailWithError:(NSError*)error;
-
-- (void)followMe;
+- (void)sendBookmark;
+- (void)sendBookmarkTicket:(OAServiceTicket *)ticket didFinishWithData:(NSData *)data;
+- (void)sendBookmarkTicket:(OAServiceTicket *)ticket didFailWithError:(NSError*)error;
 
 @end

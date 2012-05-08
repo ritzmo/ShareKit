@@ -138,13 +138,16 @@ static NSString *const kSHKTwitterUserInfo=@"kSHKTwitterUserInfo";
 
 - (BOOL)twitterFrameworkAvailable {
 	
-	BOOL result = NO;
-	
+    if ([SHKCONFIG(forcePreIOS5TwitterAccess) boolValue])
+    {
+        return NO;
+    }
+    
 	if (NSClassFromString(@"TWTweetComposeViewController")) {
-		result = YES;
+		return YES;
 	}
 	
-	return result;
+	return NO;
 }
 
 - (BOOL)prepareItem {
@@ -301,7 +304,7 @@ static NSString *const kSHKTwitterUserInfo=@"kSHKTwitterUserInfo";
 
 - (void)showTwitterForm
 {
-	SHKFormControllerLargeTextField *rootView = [[SHKFormControllerLargeTextField alloc] initWithNibName:nil bundle:nil delegate:self];	
+	SHKCustomFormControllerLargeTextField *rootView = [[SHKCustomFormControllerLargeTextField alloc] initWithNibName:nil bundle:nil delegate:self];	
 	
 	rootView.text = [item customValueForKey:@"status"];
 	rootView.maxTextLength = 140;
@@ -316,7 +319,7 @@ static NSString *const kSHKTwitterUserInfo=@"kSHKTwitterUserInfo";
 	[[SHK currentHelper] showViewController:self];	
 }
 
-- (void)sendForm:(SHKFormControllerLargeTextField *)form
+- (void)sendForm:(SHKCustomFormControllerLargeTextField *)form
 {	
 	[item setCustomValue:form.textView.text forKey:@"status"];
 	[self tryToSend];
@@ -326,9 +329,13 @@ static NSString *const kSHKTwitterUserInfo=@"kSHKTwitterUserInfo";
 
 - (BOOL)shortenURL
 {	
-	if (![SHK connected])
+	NSString *bitLyLogin = SHKCONFIG(bitLyLogin);
+	NSString *bitLyKey = SHKCONFIG(bitLyKey);
+	BOOL bitLyConfigured = [bitLyLogin length] > 0 && [bitLyKey length] > 0;
+	
+	if (bitLyConfigured == NO || ![SHK connected])
 	{
-		[item setCustomValue:[NSString stringWithFormat:@"%@ %@", item.title, [item.URL.absoluteString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] forKey:@"status"];
+		[item setCustomValue:[NSString stringWithFormat:@"%@ %@", item.title ? item.title : item.text, [item.URL.absoluteString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] forKey:@"status"];
 		return YES;
 	}
 	
@@ -336,16 +343,16 @@ static NSString *const kSHKTwitterUserInfo=@"kSHKTwitterUserInfo";
 		[[SHKActivityIndicator currentIndicator] displayActivity:SHKLocalizedString(@"Shortening URL...")];
 	
 	self.request = [[[SHKRequest alloc] initWithURL:[NSURL URLWithString:[NSMutableString stringWithFormat:@"http://api.bit.ly/v3/shorten?login=%@&apikey=%@&longUrl=%@&format=txt",
-																								 SHKCONFIG(bitLyLogin),
-																								 SHKCONFIG(bitLyKey),																		  
-																								 SHKEncodeURL(item.URL)
-																								 ]]
-														  params:nil
-														delegate:self
-										  isFinishedSelector:@selector(shortenURLFinished:)
-														  method:@"GET"
-													  autostart:YES] autorelease];
-	return NO;
+																		  bitLyLogin,
+																		  bitLyKey,																		  
+																		  SHKEncodeURL(item.URL)
+																		  ]]
+											 params:nil
+										   delegate:self
+								 isFinishedSelector:@selector(shortenURLFinished:)
+											 method:@"GET"
+										  autostart:YES] autorelease];
+    return NO;
 }
 
 - (void)shortenURLFinished:(SHKRequest *)aRequest
@@ -363,7 +370,7 @@ static NSString *const kSHKTwitterUserInfo=@"kSHKTwitterUserInfo";
 								 cancelButtonTitle:SHKLocalizedString(@"Continue")
 								 otherButtonTitles:nil] autorelease] show];
 		
-		[item setCustomValue:[NSString stringWithFormat:@"%@ %@", item.text ? item.text : item.title, [item.URL.absoluteString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] forKey:@"status"];
+		[item setCustomValue:[NSString stringWithFormat:@"%@ %@", item.title ? item.title : item.text, [item.URL.absoluteString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] forKey:@"status"];
 	}
 	
 	else
@@ -372,7 +379,7 @@ static NSString *const kSHKTwitterUserInfo=@"kSHKTwitterUserInfo";
 		if ([result isEqualToString:@"ALREADY_A_BITLY_LINK"])
 			result = [item.URL.absoluteString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 		
-		[item setCustomValue:[NSString stringWithFormat:@"%@ %@", item.text ? item.text : item.title, result] forKey:@"status"];
+		[item setCustomValue:[NSString stringWithFormat:@"%@ %@", item.title ? item.title : item.text, result] forKey:@"status"];
 	}
 	
 	[super share];
