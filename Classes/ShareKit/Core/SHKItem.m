@@ -43,7 +43,8 @@
 @implementation SHKItem
 
 @synthesize shareType;
-@synthesize URL, image, title, text, tags, data, mimeType, filename, currentOwner;
+@synthesize URL, URLContentType, image, title, text, tags, data, mimeType, filename;
+@synthesize currentOwner;
 @synthesize custom;
 @synthesize printOutputType;
 @synthesize mailBody, mailJPGQuality, mailToRecipients, isMailHTML, mailShareWithAppSignature;
