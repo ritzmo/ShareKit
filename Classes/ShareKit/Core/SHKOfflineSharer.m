@@ -160,4 +160,14 @@
 
 }
 
+- (void)sharerShowBadCredentialsAlert:(SHKSharer *)sharer
+{
+    
+}
+
+- (void)sharerShowOtherAuthorizationErrorAlert:(SHKSharer *)sharer
+{
+    
+}
+
 @end
