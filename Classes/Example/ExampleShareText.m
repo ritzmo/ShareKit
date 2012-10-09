@@ -77,6 +77,7 @@
 	SHKItem *item = [SHKItem text:text];
 	[item setAlternateText:[item.text stringByAppendingString:@" #ShareKit"] toShareOn:@"Twitter"];
 	[item setAlternateText:[item.text stringByAppendingString:@" <br/><br/>Alternate text for Email Action"] toShareOn:@"Email"];
+    item.tags = [NSArray arrayWithObjects:@"sharekit", @"testing", @"text example", nil];
 	SHKActionSheet *actionSheet = [SHKActionSheet actionSheetForItem:item];
 	[SHK setRootViewController:self];
 	[actionSheet showFromToolbar:self.navigationController.toolbar];
