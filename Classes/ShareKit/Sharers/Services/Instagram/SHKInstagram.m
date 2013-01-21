@@ -57,8 +57,7 @@
 
 + (BOOL)canShareImage
 {
-    NSURL *instagramURL = [NSURL URLWithString:@"instagram://app"];
-	return 	[[UIApplication sharedApplication] canOpenURL:instagramURL];
+    return YES;
 }
 
 + (BOOL)shareRequiresInternetConnection
@@ -79,6 +78,12 @@
 
 #pragma mark -
 #pragma mark Configuration : Dynamic Enable
+
++ (BOOL)canShare
+{
+	NSURL *instagramURL = [NSURL URLWithString:@"instagram://app"];
+	return [[UIApplication sharedApplication] canOpenURL:instagramURL];
+}
 
 + (BOOL)canAutoShare
 {
@@ -129,12 +134,12 @@
 			
 		}
 		
-		NSData* imgData = UIImageJPEGRepresentation(tmpImg, 1.0);
+		NSData* imgData = [self generateImageData:tmpImg];
 		[[NSFileManager defaultManager] createFileAtPath:docPath contents:imgData attributes:nil];
 		NSURL* url = [NSURL fileURLWithPath:docPath isDirectory:NO ];
 		self.dic = [UIDocumentInteractionController interactionControllerWithURL:url];
-		self.dic.UTI = @"com.instagram.photo";
-		NSString *captionString = [NSString stringWithFormat:@"%@%@%@", ([item.title length] ? item.title : @""), ([item.title length] && [item.tags count] ? @" " : @""), [self tagStringJoinedBy:@" " allowedCharacters:[NSCharacterSet alphanumericCharacterSet] tagPrefix:@"#"]];
+		self.dic.UTI = @"com.instagram.exclusivegram";
+		NSString *captionString = [NSString stringWithFormat:@"%@%@%@", ([item.title length] ? item.title : @""), ([item.title length] && [item.tags count] ? @" " : @""), [self tagStringJoinedBy:@" " allowedCharacters:[NSCharacterSet alphanumericCharacterSet] tagPrefix:@"#" tagSuffix:nil]];
 		self.dic.annotation = @{@"InstagramCaption" : captionString};
 		self.dic.delegate = self;
 		UIView* bestView = self.view;
@@ -142,7 +147,7 @@
 			// we haven't been presented yet, so we're not in the hierarchy. On the iPad the DIC is
 			// presented in a popover and that really wants a view rooted in a window. Since we
 			// set the rootViewController in the controller that presents this one, we can use it
-			UIViewController* crvc = [[SHK currentHelper] rootViewForCustomUIDisplay];
+			UIViewController* crvc = [[SHK currentHelper] rootViewForUIDisplay];
 			if (crvc != nil && crvc.view.window != nil ) {
 				bestView = crvc.view;
 			}
@@ -154,6 +159,11 @@
 		return YES;
 	}
 	return NO;
+}
+
+- (NSData*) generateImageData:(UIImage*)image
+{
+	return UIImageJPEGRepresentation(image,1.0);
 }
 
 - (void)documentInteractionControllerDidDismissOpenInMenu:(UIDocumentInteractionController *)controller{

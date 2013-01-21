@@ -32,8 +32,10 @@
 #import "SHKTwitter.h"
 #import "JSONKit.h"
 #import "SHKXMLResponseParser.h"
+#import "SHKiOSTwitter.h"
 #import "SHKiOS5Twitter.h"
 #import "NSMutableDictionary+NSNullsToEmptyStrings.h"
+#import <Social/Social.h>
 
 static NSString *const kSHKTwitterUserInfo=@"kSHKTwitterUserInfo";
 
@@ -118,22 +120,31 @@ static NSString *const kSHKTwitterUserInfo=@"kSHKTwitterUserInfo";
 #pragma mark Commit Share
 
 - (void)share {
-	
-	if ([self twitterFrameworkAvailable]) {
-		
-		SHKSharer *sharer =[SHKiOS5Twitter shareItem:self.item];
-        sharer.quiet = self.quiet;
-        sharer.shareDelegate = self.shareDelegate;
-		[SHKTwitter logout];//to clean credentials - we will not need them anymore
-		return;
+	if ([self socialFrameworkAvailable])
+	{
+		SHKSharer *sharer = [SHKiOSTwitter shareItem:self.item];
+		[self setupiOSSharer:sharer];
 	}
-	
-	BOOL itemPrepared = [self prepareItem];
-	
-	//the only case item is not prepared is when we wait for URL to be shortened on background thread. In this case [super share] is called in callback method
-	if (itemPrepared) {
-		[super share];
+	else if ([self twitterFrameworkAvailable])
+	{
+		SHKSharer *sharer = [SHKiOS5Twitter shareItem:self.item];
+		[self setupiOSSharer:sharer];
 	}
+	else
+	{
+		BOOL itemPrepared = [self prepareItem];
+		// the only case item is not prepared is when we wait for URL to be shortened on background thread. In this case [super share] is called in callback method
+		if (itemPrepared)
+		{
+			[super share];
+		}
+	}
+}
+
+- (void)setupiOSSharer:(SHKSharer *)sharer {
+    sharer.quiet = self.quiet;
+    sharer.shareDelegate = self.shareDelegate;
+    [SHKTwitter logout];//to clean credentials - we will not need them anymore
 }
 
 #pragma mark -
@@ -152,6 +163,21 @@ static NSString *const kSHKTwitterUserInfo=@"kSHKTwitterUserInfo";
 	return NO;
 }
 
+- (BOOL)socialFrameworkAvailable {
+    
+    if ([SHKCONFIG(forcePreIOS5TwitterAccess) boolValue])
+    {
+        return NO;
+    }
+    
+	if (NSClassFromString(@"SLComposeViewController"))
+    {
+		return YES;
+	}
+	
+	return NO;
+}
+
 - (BOOL)prepareItem {
 	
 	BOOL result = YES;
@@ -160,15 +186,23 @@ static NSString *const kSHKTwitterUserInfo=@"kSHKTwitterUserInfo";
 	{
 		BOOL isURLAlreadyShortened = [self shortenURL];
 		result = isURLAlreadyShortened;
-		
 	}
-    
-    NSString *hashtags = [self tagStringJoinedBy:@" " allowedCharacters:[NSCharacterSet alphanumericCharacterSet] tagPrefix:@"#"];
-    
-    NSString *tweetBody = [NSString stringWithFormat:@"%@%@%@",(item.shareType == SHKShareTypeText ? item.text : item.title ),([hashtags length] ? @" " : @""), hashtags];
-	
-    [item setCustomValue:tweetBody forKey:@"status"];
-    
+
+	NSString *status = [item customValueForKey:@"status"];
+	if (!status)
+	{
+		status = item.shareType == SHKShareTypeText ? item.text : item.title;
+	}
+
+	NSString *hashtags = [self tagStringJoinedBy:@" " allowedCharacters:[NSCharacterSet alphanumericCharacterSet]
+	                                   tagPrefix:@"#" tagSuffix:nil];
+	if ([hashtags length] > 0)
+	{
+		status = [NSString stringWithFormat:@"%@ %@", status, hashtags];
+	}
+
+	[item setCustomValue:status forKey:@"status"];
+
 	return result;
 }
 
@@ -333,12 +367,15 @@ static NSString *const kSHKTwitterUserInfo=@"kSHKTwitterUserInfo";
 	
 	if (bitLyConfigured == NO || ![SHK connected])
 	{
-		[item setCustomValue:[NSString stringWithFormat:@"%@ %@", item.title ? item.title : item.text, [item.URL.absoluteString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] forKey:@"status"];
+		NSString *url = [item.URL.absoluteString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+		[item setCustomValue:[NSString stringWithFormat:@"%@ %@", item.title ? item.title : item.text, url] forKey:@"status"];
 		return YES;
 	}
 	
 	if (!quiet)
+	{
 		[[SHKActivityIndicator currentIndicator] displayActivity:SHKLocalizedString(@"Shortening URL...")];
+	}
 	
 	self.request = [[[SHKRequest alloc] initWithURL:[NSURL URLWithString:[NSMutableString stringWithFormat:@"http://api.bit.ly/v3/shorten?login=%@&apikey=%@&longUrl=%@&format=txt",
 																		  bitLyLogin,
