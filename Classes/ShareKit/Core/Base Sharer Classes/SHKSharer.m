@@ -184,7 +184,7 @@
 			self.modalPresentationStyle = [SHK modalPresentationStyleForController:self];
 		
 		if ([self respondsToSelector:@selector(modalTransitionStyle)])
-			self.modalTransitionStyle = [SHK modalTransitionStyle];
+			self.modalTransitionStyle = [SHK modalTransitionStyleForController:self];
 	}
 	return self;
 }
